@@ -8,7 +8,7 @@ const APP_ID = 'com.margin.docs';
 const DOCUMENTS = ['margin', 'docx', 'odt', 'pdf', 'md', 'markdown', 'txt', 'html', 'htm'];
 const FORMATS = {
   margin: 'Margin document', docx: 'Word document', pdf: 'PDF document',
-  md: 'Markdown document', txt: 'Plain text', html: 'HTML document',
+  odt: 'OpenDocument Text', md: 'Markdown document', txt: 'Plain text', html: 'HTML document',
 };
 const IMAGE_TYPES = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif' };
 const entry = path.resolve(__dirname, '../dist/index.html');
@@ -90,7 +90,7 @@ async function readFile(file, image = false) {
 async function chooseOpen(image) {
   const filters = image
     ? [{ name: 'Images', extensions: Object.keys(IMAGE_TYPES) }]
-    : [{ name: 'Supported documents', extensions: DOCUMENTS }, { name: 'Margin documents', extensions: ['margin'] }, { name: 'PDF documents', extensions: ['pdf'] }, { name: 'Word documents', extensions: ['docx'] }];
+    : [{ name: 'Supported documents', extensions: DOCUMENTS }, { name: 'Margin documents', extensions: ['margin'] }, { name: 'PDF documents', extensions: ['pdf'] }, { name: 'Word documents', extensions: ['docx'] }, { name: 'OpenDocument Text', extensions: ['odt'] }];
   const result = await dialog.showOpenDialog(win, { title: image ? 'Insert an image' : 'Open a document', properties: ['openFile'], filters });
   return result.canceled ? null : readFile(result.filePaths[0], image);
 }
@@ -176,10 +176,12 @@ handle('external', async (url) => {
   const resolved = new URL(url);
   if (/^(https?:|mailto:)$/.test(resolved.protocol)) await shell.openExternal(resolved.href);
 });
-handle('theme', (mode) => {
-  const light = mode === 'light';
-  win.setTitleBarOverlay({ color: light ? '#f7f7fa' : '#17171a', symbolColor: light ? '#282433' : '#ededf0', height: 51 });
+const titleBarColors = (light) => ({
+  color: light ? '#f6f6f5' : '#181818',
+  symbolColor: light ? '#242424' : '#eeeeed',
+  height: 51,
 });
+handle('theme', (mode) => win.setTitleBarOverlay(titleBarColors(mode === 'light')));
 handle('ready', async () => {
   ready = true;
   return Promise.all(launchFiles.splice(0).map((file) => readFile(file).catch(() => null)));
@@ -210,8 +212,8 @@ function createWindow() {
   ready = false;
   win = new BrowserWindow({
     width: 1360, height: 900, minWidth: 740, minHeight: 540, show: false,
-    icon: path.resolve(__dirname, '../build/icon.png'), backgroundColor: '#202024', title: 'Margin',
-    titleBarStyle: 'hidden', titleBarOverlay: { color: light ? '#f7f7fa' : '#17171a', symbolColor: light ? '#282433' : '#ededf0', height: 51 },
+    icon: path.resolve(__dirname, '../build/icon.png'), backgroundColor: '#222222', title: 'Margin',
+    titleBarStyle: 'hidden', titleBarOverlay: titleBarColors(light),
     webPreferences: { preload: path.join(__dirname, 'preload.cjs'), sandbox: true, contextIsolation: true, nodeIntegration: false, spellcheck: true },
   });
   win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));

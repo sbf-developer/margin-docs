@@ -13,13 +13,13 @@ Margin is a local-first word processor for Windows. Open a file, edit it on the 
 | --- | --- | --- |
 | Margin (`.margin`) | Yes | Yes |
 | Word (`.docx`) | Yes | Yes |
-| OpenDocument Text (`.odt`) | Yes | |
+| OpenDocument Text (`.odt`, Apache OpenOffice Writer) | Yes | Yes |
 | PDF (`.pdf`) | Text-based PDFs | Yes |
 | Markdown (`.md`, `.markdown`) | Yes | Yes (`.md`) |
 | HTML (`.html`, `.htm`) | Yes | Yes (`.html`) |
 | Plain text (`.txt`) | Yes | Yes |
 
-Word and OpenDocument import preserve common structural features such as headings, lists, and tables. Complex page layouts and Word-specific features can simplify during conversion. PDF import reconstructs structure from the text layer and positions. Review multi-column layouts, tables, and headings after conversion. A scanned PDF needs an OCR text layer before import.
+OpenDocument import and export support common Writer features such as headings, inline formatting, lists, tables, images, and page setup. Word import preserves common structural features such as headings, lists, and tables. Complex page layouts and application-specific features can simplify during conversion. PDF import reconstructs structure from the text layer and positions. Review multi-column layouts, tables, and headings after conversion. A scanned PDF needs an OCR text layer before import.
 
 ## Build on Windows
 

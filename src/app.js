@@ -350,10 +350,10 @@ function closeMenu(restore = false) {
 
 const option = (label, run, properties = {}) => ({ label, run, ...properties });
 const flagged = (value) => ({ checked: value });
-const colors = ['#262330', '#81778f', '#ae2e39', '#b45f16', '#966c05', '#267554', '#237a83', '#2d63bb', '#5b3da8', '#ac3571', '#d1c1f0', '#ffffff'];
-const highlights = ['#fff0a5', '#f8d0d7', '#e9dcff', '#cfe8fb', '#ccefe1', '#ffddbe'];
-const colorNames = ['Ink', 'Gray', 'Red', 'Orange', 'Gold', 'Green', 'Teal', 'Blue', 'Violet', 'Rose', 'Lavender', 'White'];
-const highlightNames = ['Yellow', 'Pink', 'Lavender', 'Blue', 'Mint', 'Peach'];
+const colors = ['#252525', '#555552', '#83837f', '#b7b7b3', '#dbdbd8', '#ffffff', '#a93237', '#a35d26', '#866417', '#32694e', '#326d77', '#325987'];
+const highlights = ['#f7ebbb', '#f1d9d8', '#e7e7e3', '#d7e5eb', '#dae9df', '#f5e0cc'];
+const colorNames = ['Ink', 'Graphite', 'Gray', 'Silver', 'Light gray', 'White', 'Red', 'Orange', 'Gold', 'Green', 'Teal', 'Blue'];
+const highlightNames = ['Sand', 'Rose', 'Gray', 'Blue', 'Sage', 'Peach'];
 
 function menuOptions(name, anchor) {
   const textStyle = editor.getAttributes('textStyle');
@@ -377,6 +377,7 @@ function menuOptions(name, anchor) {
       return [
         option('PDF document', () => saveAs('pdf'), { icon: 'file-text' }),
         option('Word document (.docx)', () => saveAs('docx'), { icon: 'file-text' }),
+        option('OpenDocument Text (.odt)', () => saveAs('odt'), { icon: 'file-text' }),
         option('Margin document (.margin)', () => saveAs('margin', true), { icon: 'file' }), null,
         option('Markdown (.md)', () => saveAs('md'), { icon: 'file-text' }),
         option('HTML (.html)', () => saveAs('html'), { icon: 'file-text' }),

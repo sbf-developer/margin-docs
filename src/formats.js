@@ -5,7 +5,8 @@ const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 const mime = {
   margin: 'application/json', html: 'text/html', md: 'text/markdown',
-  txt: 'text/plain', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', pdf: 'application/pdf',
+  txt: 'text/plain', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  odt: 'application/vnd.oasis.opendocument.text', pdf: 'application/pdf',
 };
 
 export const escapeHTML = (value) => String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
@@ -120,7 +121,7 @@ export async function openDocument(name, data, onProgress) {
     }
     case 'odt': {
       const { fromODT } = await import('./odt.js');
-      parsed = { html: await fromODT(bytes) };
+      parsed = await fromODT(bytes);
       break;
     }
     case 'pdf': {
@@ -173,6 +174,10 @@ export async function exportDocument(format, record) {
     const { toDOCX } = await import('./word.js');
     return toDOCX(html, record.title, record.page);
   }
+  if (format === 'odt') {
+    const { toODT } = await import('./odt-export.js');
+    return toODT(html, record.title, record.page);
+  }
   if (format === 'md') {
     const [{ default: Turndown }, { gfm }] = await Promise.all([import('turndown'), import('turndown-plugin-gfm')]);
     const converter = new Turndown({ headingStyle: 'atx', codeBlockStyle: 'fenced', bulletListMarker: '-' });
@@ -194,18 +199,18 @@ export function printDocument(record) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHTML(record.title)}</title><style>
 @page{size:${page.paper} ${page.landscape ? 'landscape' : 'portrait'};margin:${page.margin}in}
-*{box-sizing:border-box}body{margin:2rem auto;padding:0 1rem;max-width:8.5in;color:#292532;background:#fff;font:12pt/1.6 "${page.font}",serif;overflow-wrap:anywhere}
+*{box-sizing:border-box}body{margin:2rem auto;padding:0 1rem;max-width:8.5in;color:#252525;background:#fff;font:12pt/1.6 "${page.font}",serif;overflow-wrap:anywhere}
 @media print{body{margin:0;padding:0;max-width:none}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}[data-page-break]{break-after:page}}
 main>:first-child{margin-top:0}p{margin:0 0 .75em;orphans:2;widows:2}
 h1,h2,h3,h4,h5,h6{line-height:1.12;margin:1.2em 0 .4em;break-after:avoid;font-weight:600}h1{font-size:3.45em;font-weight:500;line-height:1.03;letter-spacing:-.065em}h2{font-size:1.55em;letter-spacing:-.035em}h3{font-size:1.22em}
-blockquote{border-left:3px solid #a287e3;background:#f7f4fd;color:#4b385f;margin:1.45em 0 1.6em;padding:.7em 1.05em;font-style:italic}
+blockquote{border-left:3px solid #999995;background:#f4f4f2;color:#494947;margin:1.45em 0 1.6em;padding:.7em 1.05em;font-style:italic}
 blockquote :last-child,li>:last-child,td>:last-child,th>:last-child{margin-bottom:0}
-a{color:#6444a8}ul,ol{margin:.4em 0 .9em;padding-left:1.5em}li{margin:.24em 0}li::marker{color:#7557b3}
+a{color:#354f62}ul,ol{margin:.4em 0 .9em;padding-left:1.5em}li{margin:.24em 0}li::marker{color:#575754}
 ul[data-type=taskList]{list-style:none;padding-left:0}li[data-type=taskItem]{display:flex;gap:.4em}li[data-type=taskItem]::before{content:'☐'}li[data-checked=true]::before{content:'☑'}
 img{display:block;max-width:100%;max-height:8in;height:auto;margin:1em 0;break-inside:avoid}
-hr{border:0;border-top:1px solid #d8d2e2;margin:1.5em 0}
-pre{white-space:pre-wrap;background:#f4f1f8;padding:.8em 1em}
-table{width:100%;border-collapse:collapse;table-layout:fixed;margin:1em 0;font-size:.94em}tr{break-inside:avoid}td,th{border:1px solid #ddd7e8;padding:.45em .65em;vertical-align:top}th{background:#f3effa;text-align:left}
+hr{border:0;border-top:1px solid #d8d8d4;margin:1.5em 0}
+pre{white-space:pre-wrap;background:#f2f3f0;padding:.8em 1em}
+table{width:100%;border-collapse:collapse;table-layout:fixed;margin:1em 0;font-size:.94em}tr{break-inside:avoid}td,th{border:1px solid #dcdcd8;padding:.45em .65em;vertical-align:top}th{background:#f1f1ee;text-align:left}
 </style></head><body><main>${cleanHTML(record.html)}</main></body></html>`;
 }
 

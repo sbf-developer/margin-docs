@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { _electron as electron, expect } from '@playwright/test';
-import { zipSync, strToU8 } from 'fflate';
+import { unzipSync, strFromU8, zipSync, strToU8 } from 'fflate';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const work = path.resolve(root, '../margin-test');
@@ -145,6 +145,63 @@ test('Windows editing, local persistence, file dialogs, and conversion round tri
     await openAt(app, page, nativeFile, 'Verification');
     await expect(reopened.locator('tr')).toHaveCount(4);
     assert.deepEqual(unexpected, []);
+  } finally {
+    await app.close().catch(() => {});
+  }
+});
+
+test('OpenDocument export and import preserve editable content and page setup', { timeout: 90000 }, async () => {
+  await mkdir(work, { recursive: true });
+  const run = await mkdtemp(path.join(work, 'odt-'));
+  const { app, page } = await launch(path.join(run, 'profile'));
+  try {
+    const image = (await readFile(path.join(root, 'build', 'icon.png'))).toString('base64');
+    const source = path.join(run, 'Draft.margin');
+    const layout = { paper: 'A4', landscape: true, margin: .75, font: 'Calibri' };
+    await writeFile(source, JSON.stringify({
+      format: 'margin', version: 1, title: 'Draft', page: layout,
+      html: '<h1>Interoperability</h1><p style="text-align:center"><strong>Bold</strong> <em>Italic</em> <u>Underline</u> <s>Strike</s> <a href="https://www.openoffice.org/">Writer</a> <sup>2</sup></p>'
+        + '<ol start="4"><li><p>First numbered item</p><ul><li><p>Nested bullet</p></li></ul></li><li><p>Second numbered item</p></li></ol>'
+        + '<ul data-type="taskList"><li data-type="taskItem" data-checked="true"><p>Done</p></li><li data-type="taskItem" data-checked="false"><p>Pending</p></li></ul>'
+        + '<table><tbody><tr><th colspan="2"><p>Milestone</p></th></tr><tr><td rowspan="2"><p>Check</p></td><td><p>Format</p></td></tr><tr><td><p>Page setup</p></td></tr></tbody></table>'
+        + '<div data-page-break="true"></div><p>Second page &amp; résumé.</p><img src="data:image/png;base64,' + image + '" alt="Margin icon">',
+    }));
+    await openAt(app, page, source, 'Draft');
+    const file = path.join(run, 'Writer draft.odt');
+    await saveAt(app, page, 'OpenDocument Text (.odt)', file);
+    const bytes = await readFile(file);
+    assert.equal(bytes.readUInt32LE(0), 0x04034b50);
+    assert.equal(bytes.readUInt16LE(8), 0, 'The first ZIP entry must be uncompressed.');
+    assert.equal(bytes.readUInt16LE(28), 0, 'The mimetype ZIP entry must have no extra field.');
+    assert.equal(bytes.subarray(30, 38).toString(), 'mimetype');
+    const parts = unzipSync(bytes);
+    assert.equal(strFromU8(parts.mimetype), 'application/vnd.oasis.opendocument.text');
+    assert.match(strFromU8(parts['META-INF/manifest.xml']), /manifest:full-path="Pictures\/Image1\.png"/);
+    assert.match(strFromU8(parts['styles.xml']), /style:print-orientation="landscape"/);
+    const body = strFromU8(parts['content.xml']);
+    assert.match(body, /table:number-columns-spanned="2"/);
+    assert.match(body, /table:number-rows-spanned="2"/);
+    assert.match(body, /text:start-value="4"/);
+    assert.match(body, /<text:list text:style-name="MarginBullet">/);
+
+    await openAt(app, page, file, 'Writer draft');
+    const editor = page.getByRole('textbox', { name: 'Document editor' });
+    await expect(editor.locator('h1')).toHaveText('Interoperability');
+    await expect(editor.locator('strong').filter({ hasText: /^Bold$/ })).toHaveCount(1);
+    await expect(editor.locator('em')).toHaveText('Italic');
+    await expect(editor.locator('u')).toHaveText('Underline');
+    await expect(editor.locator('s')).toHaveText('Strike');
+    await expect(editor.locator('sup')).toHaveText('2');
+    await expect(editor.locator('p[style*="text-align: center"]')).toContainText('Underline');
+    await expect(editor.locator('ol[start="4"] ul')).toContainText('Nested bullet');
+    await expect(editor.locator('th[colspan="2"]')).toHaveText('Milestone');
+    await expect(editor.locator('td[rowspan="2"]')).toHaveText('Check');
+    await expect(editor.locator('img[alt="Margin icon"]')).toBeVisible();
+    await expect(editor.locator('[data-page-break]')).toHaveCount(1);
+    await expect(editor.locator('ul[data-type="taskList"] input').first()).toBeChecked();
+    const native = path.join(run, 'Roundtrip.margin');
+    await saveAt(app, page, 'Margin document (.margin)', native);
+    assert.deepEqual(JSON.parse(await readFile(native, 'utf8')).page, layout);
   } finally {
     await app.close().catch(() => {});
   }

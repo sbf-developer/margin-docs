@@ -138,7 +138,7 @@ export async function toDOCX(html, title, rawPage) {
             cells.push(new TableCell({
               columnSpan: cell.colSpan || 1, rowSpan: cell.rowSpan || 1,
               margins: { top: 82, bottom: 82, left: 112, right: 112 },
-              shading: cell.matches('th') ? { fill: 'F3EFFA' } : undefined,
+              shading: cell.matches('th') ? { fill: 'F1F1EE' } : undefined,
               children: content.length ? content : [new Paragraph('')],
             }));
           }
@@ -148,10 +148,10 @@ export async function toDOCX(html, title, rawPage) {
       } else if (node.matches('blockquote')) {
         result.push(...await blocks(node.childNodes, { ...context, quote: true }));
       } else if (node.matches('hr')) {
-        result.push(new Paragraph({ border: { bottom: { color: 'D8D2E2', size: 6, style: BorderStyle.SINGLE } } }));
+        result.push(new Paragraph({ border: { bottom: { color: 'D8D8D4', size: 6, style: BorderStyle.SINGLE } } }));
       } else {
         const heading = /^h[1-6]$/.test(node.localName) ? headingNames[Number(node.localName[1]) - 1] : undefined;
-        const inherited = fontOptions(node, context.quote ? { italics: true, color: '4B385F' } : {});
+        const inherited = fontOptions(node, context.quote ? { italics: true, color: '494947' } : {});
         const content = node.matches('img') ? [await imageRun(node, maxWidth)] : await runs(node.childNodes, inherited, maxWidth);
         if (context.taskText) content.unshift(new TextRun(context.taskText));
         const line = parseFloat(node.style.lineHeight);
@@ -161,7 +161,7 @@ export async function toDOCX(html, title, rawPage) {
           keepNext: Boolean(heading),
           spacing: Number.isFinite(line) && line >= 1 && line <= 3 ? { line: Math.round(line * 240) } : undefined,
           indent: context.quote ? { left: 300, right: 120 } : undefined,
-          border: context.quote ? { left: { color: 'A287E3', size: 14, space: 8, style: BorderStyle.SINGLE } } : undefined,
+          border: context.quote ? { left: { color: '999995', size: 14, space: 8, style: BorderStyle.SINGLE } } : undefined,
         }));
       }
     }
@@ -172,10 +172,10 @@ export async function toDOCX(html, title, rawPage) {
   const document = new Document({
     title, creator: 'Margin', numbering: { config: numbering },
     styles: { default: {
-      document: { run: { font, size: 24, color: '292532' }, paragraph: { spacing: { after: 125, line: 330 } } },
-      heading1: { run: { font, size: 76, bold: false, color: '292532' }, paragraph: { spacing: { before: 180, after: 260, line: 270 } } },
-      heading2: { run: { font, size: 36, bold: true, color: '292532' }, paragraph: { spacing: { before: 290, after: 105 } } },
-      heading3: { run: { font, size: 30, bold: true, color: '292532' } },
+      document: { run: { font, size: 24, color: '252525' }, paragraph: { spacing: { after: 125, line: 330 } } },
+      heading1: { run: { font, size: 76, bold: false, color: '252525' }, paragraph: { spacing: { before: 180, after: 260, line: 270 } } },
+      heading2: { run: { font, size: 36, bold: true, color: '252525' }, paragraph: { spacing: { before: 290, after: 105 } } },
+      heading3: { run: { font, size: 30, bold: true, color: '252525' } },
     } },
     sections: [{ properties: { page: { size: { width, height, orientation: page.landscape ? PageOrientation.LANDSCAPE : PageOrientation.PORTRAIT },
       margin: { top: margin, right: margin, bottom: margin, left: margin } } }, children: children.length ? children : [new Paragraph('')] }],
