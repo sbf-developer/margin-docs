@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' file:; script-src 'self' file:; style-src 'self' file: 'unsafe-inline'; img-src 'self' file: data: blob:; font-src 'self' file: data:; worker-src 'self' file: blob:; connect-src 'self' file:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Margin</title>
+</head>
+<body>
+  <div id="app">
+    <header class="titlebar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 26 26" fill="none"><rect x="5.25" y="4.75" width="15.5" height="16.5" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M10 5.5v15M13 10h4.2M13 13h4.2M13 16h2.7" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/></svg></span><span>Margin</span><button class="icon-button sidebar-toggle" data-action="sidebar" data-icon="panel-left" aria-label="Toggle sidebar"></button></div>
+      <div class="title-content">
+        <button class="document-label" id="document-label" data-menu="document" aria-label="Document options"><span data-icon="file-text"></span><span id="document-title"></span><span data-icon="chevron-down" class="title-chevron"></span></button>
+        <div class="title-actions">
+          <span class="save-status" id="save-status" role="status"><span data-icon="circle-check"></span><span id="save-label">Saved locally</span></span>
+          <button class="button primary export-button" data-menu="export"><span data-icon="download"></span><span>Export</span><span data-icon="chevron-down"></span></button>
+        </div>
+      </div>
+    </header>
+    <aside class="sidebar" aria-label="Workspace sidebar">
+      <div class="sidebar-top">
+        <div class="workspace-label">Workspace</div>
+        <button class="button new-button" data-action="new"><span data-icon="plus"></span><span>New document</span><kbd id="new-shortcut">Ctrl N</kbd></button>
+        <button class="sidebar-link" data-action="open"><span data-icon="folder-open"></span><span>Open file…</span></button>
+      </div>
+      <section class="sidebar-section documents-section">
+        <div class="section-heading"><span>Documents</span><button class="icon-button" data-action="library" data-icon="search" aria-label="Search documents"></button></div>
+        <nav id="documents" aria-label="Documents"></nav>
+      </section>
+      <section class="sidebar-section outline-section">
+        <div class="section-heading"><span>Outline</span><button class="icon-button" data-action="outline" data-icon="list-tree" aria-label="Toggle outline" aria-expanded="true"></button></div>
+        <nav id="outline" aria-label="Document outline"></nav>
+      </section>
+      <div class="sidebar-bottom">
+        <button class="sidebar-link" data-action="settings"><span data-icon="settings"></span><span>Settings</span></button>
+        <button class="icon-button" data-action="help" data-icon="circle-help" aria-label="Keyboard shortcuts"></button>
+      </div>
+    </aside>
+    <main class="workspace">
+      <div class="toolbar" id="toolbar" role="toolbar" aria-label="Document editing tools">
+        <div class="tool-group">
+          <button class="icon-button" data-cmd="undo" data-icon="undo-2" aria-label="Undo" title="Undo (Ctrl+Z)"></button>
+          <button class="icon-button" data-cmd="redo" data-icon="redo-2" aria-label="Redo" title="Redo (Ctrl+Y)"></button>
+        </div>
+        <div class="tool-group typography">
+          <button class="tool-select style-select" data-menu="style"><span id="style-label">Body text</span><span data-icon="chevron-down"></span></button>
+          <button class="tool-select font-select" data-menu="font"><span id="font-label">Georgia</span><span data-icon="chevron-down"></span></button>
+          <button class="tool-select size-select" data-menu="size" aria-label="Font size"><span id="size-label">12</span><span data-icon="chevron-down"></span></button>
+        </div>
+        <div class="tool-group">
+          <button class="icon-button" data-cmd="bold" data-icon="bold" aria-label="Bold" title="Bold (Ctrl+B)"></button>
+          <button class="icon-button" data-cmd="italic" data-icon="italic" aria-label="Italic" title="Italic (Ctrl+I)"></button>
+          <button class="icon-button" data-cmd="underline" data-icon="underline" aria-label="Underline" title="Underline (Ctrl+U)"></button>
+          <button class="icon-button color-tool" data-menu="color" data-icon="baseline" aria-label="Text color" title="Text color"></button>
+          <button class="icon-button" data-menu="highlight" data-icon="highlighter" aria-label="Highlight" title="Highlight"></button>
+        </div>
+        <div class="tool-group">
+          <button class="icon-button" data-menu="alignment" data-icon="align-left" aria-label="Paragraph alignment" title="Alignment"></button>
+          <button class="icon-button" data-cmd="bullet" data-icon="list" aria-label="Bulleted list" title="Bulleted list"></button>
+          <button class="icon-button" data-cmd="numbered" data-icon="list-ordered" aria-label="Numbered list" title="Numbered list"></button>
+          <button class="icon-button" data-menu="spacing" data-icon="list-collapse" aria-label="Line spacing" title="Line spacing"></button>
+        </div>
+        <div class="tool-group">
+          <button class="icon-button" data-action="link" data-icon="link-2" aria-label="Insert link" title="Insert link (Ctrl+K)"></button>
+          <button class="icon-button" data-menu="table" data-icon="table-2" aria-label="Table tools" title="Table tools"></button>
+          <button class="icon-button" data-menu="insert" data-icon="plus" aria-label="More insert options" title="Insert"></button>
+        </div>
+        <div class="tool-group toolbar-end">
+          <button class="icon-button" data-action="find" data-icon="search" aria-label="Find and replace" title="Find and replace (Ctrl+F)"></button>
+          <button class="icon-button" data-menu="view" data-icon="ellipsis" aria-label="View and layout options" title="View and layout"></button>
+        </div>
+      </div>
+      <div class="find-bar" id="find-bar" hidden>
+        <input id="find-query" placeholder="Find in document" aria-label="Find in document" autocomplete="off">
+        <span id="find-count" aria-live="polite"></span>
+        <button class="icon-button" data-action="previous-match" data-icon="chevron-up" aria-label="Previous match"></button>
+        <button class="icon-button" data-action="next-match" data-icon="chevron-down" aria-label="Next match"></button>
+        <button class="icon-button" id="match-case" data-action="match-case" aria-label="Match case" aria-pressed="false">Aa</button>
+        <button class="icon-button" data-action="close-find" data-icon="x" aria-label="Close search"></button>
+        <input id="replace-query" placeholder="Replace with" aria-label="Replace with" autocomplete="off">
+        <button class="button subtle" data-action="replace">Replace</button><button class="button subtle" data-action="replace-all">Replace all</button>
+      </div>
+      <div class="canvas" id="canvas">
+        <div class="sheet-space">
+          <div class="ruler" id="ruler" aria-hidden="true"><div class="ruler-ticks"></div><i class="margin-guide left"></i><i class="margin-guide right"></i></div>
+          <article class="sheet" id="sheet" aria-label="Document page"><div id="editor" class="document-body"></div></article>
+        </div>
+      </div>
+      <footer class="statusbar">
+        <div class="status-group"><span id="word-count">0 words</span><span class="status-dot"></span><span id="character-count">0 characters</span></div>
+        <div class="status-group">
+          <button class="icon-button" data-action="focus" data-icon="scan-line" aria-label="Toggle focus mode" title="Focus mode"></button>
+          <span class="status-divider"></span>
+          <button class="icon-button" data-action="zoom-out" data-icon="minus" aria-label="Zoom out"></button>
+          <button class="zoom-label" id="zoom-label" data-menu="zoom">100%</button>
+          <button class="icon-button" data-action="zoom-in" data-icon="plus" aria-label="Zoom in"></button>
+        </div>
+      </footer>
+    </main>
+  </div>
+  <input type="file" id="open-input" accept=".margin,.docx,.odt,.pdf,.md,.markdown,.txt,.html,.htm" hidden>
+  <input type="file" id="image-input" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+  <div id="menu" class="popup" role="menu" hidden></div>
+  <dialog id="dialog"></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <script type="module" src="/src/app.js"></script>
+</body>
+</html>
